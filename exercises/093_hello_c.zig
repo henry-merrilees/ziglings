@@ -38,31 +38,18 @@
 // and call a C function out of Zig.
 
 // our well-known "import" for Zig
-const std = @import("std");
-
-// and here the new the import for C
-const c = @cImport({
-    @cInclude("unistd.h");
-});
-
-pub fn main() void {
-
-    // In order to output text that can be evaluated by the
-    // Zig Builder, we need to write it to the Error output.
-    // In Zig, we do this with "std.debug.print" and in C we can
-    // specify a file descriptor i.e. 2 for error console.
-    //
-    // In this exercise we use 'write' to output 17 chars,
-    // but something is still missing...
-    const c_res = write(2, "Hello C from Zig!", 17);
-
-    // let's see what the result from C is:
-    std.debug.print(" - C result is {d} chars written.\n", .{c_res});
-}
-//
 // Something must be considered when compiling with C functions.
 // Namely that the Zig compiler knows that it should include
 // corresponding libraries. For this purpose we call the compiler
 // with the parameter "lc" for such a program,
 // e.g. "zig run -lc hello_c.zig".
-//
+
+const print = @import("std").debug.print;
+const c = @cImport({
+    @cInclude("unistd.h");
+});
+
+pub fn main() void {
+    const c_res = c.write(2, "Hello C from Zig!", 17);
+    print(" - C result is {d} chars written.\n", .{c_res});
+}
